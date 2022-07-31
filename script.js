@@ -156,7 +156,7 @@ class Comment {
     reply_box.innerHTML =
       "<div class='inner-reply'><div class='avatar'><img src=" +
       commentsObj.currentUser.image.png +
-      "></div><div class='reply-input'><input type='text'></div><div class='reply-send-btn'><button>Send</button></div></div>";
+      "></div><div class='reply-input'><textarea name='reply-input' rows='4'></textarea></div><div class='reply-send-btn'><button>Send</button></div></div>";
     target_comment.parentElement.insertBefore(
       reply_box,
       target_comment.nextSibling,
@@ -176,9 +176,6 @@ if (localStorage.commentsObj) {
       renderElements(commentsObj);
     });
 }
-
-
-
 
 function renderElements(obj) {
   obj.comments.forEach((comment) => {

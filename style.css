@@ -1,5 +1,6 @@
 :root{
   --lightwheat: #F5F6FA;
+  --defaultblue: hsl(211, 10%, 45%)
 }
 body{
   background-color: var(--lightwheat);
@@ -13,11 +14,15 @@ body{
   max-width: 600px;
   margin: 0 auto;
 }
+.main-comment-wrapper{
+  display: flex;
+  flex-direction: column;
+}
 .comment-box{
 background-color: white;
 border-radius: 10px;
 overflow: hidden;
-padding: 15px 12px;
+padding: 15px;
 margin: 10px 0;
 }
 .comment-box .inner{
@@ -76,8 +81,23 @@ margin: 10px 0;
   padding-right: 30px;
 }
 
-.first-reply{
+.first-reply, .reply-box{
   width: 85%;
-  left: 11%;
-  position: relative;
+  align-self: flex-end;
+}
+.inner-reply{
+  display: grid;
+  grid-template-columns: 42px 1fr 88px;
+}
+.inner-reply .avatar img{
+  width: 100%;
+}
+.inner-reply .reply-input{
+  padding: 0 20px;
+}
+.inner-reply .reply-input textarea{
+  width: 100%;
+  min-height: 75px;
+  border-radius: 10px;
+  border: var(--defaultblue) 1px solid;
 }
