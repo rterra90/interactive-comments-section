@@ -22,7 +22,7 @@ class Comment {
     if (type == 'main') {
       inner_comment = document.createElement('div');
       inner_comment.classList.add('comment-box');
-      inner_comment.id = this.id;
+      inner_comment.dataset.id = this.id;
       new_comment_element.appendChild(inner_comment);
     }
     //create rating section
@@ -31,21 +31,25 @@ class Comment {
     rating_section.dataset.id = this.id;
     type == 'reply_1' && rating_section.classList.add('is-reply');
     rating_section.innerHTML =
-      '<div onclick=handleRating() role="button" data-rating="+">+</div><div class="current-rating">' +
+      '<div onclick=Comment.updateScore() role="button" data-rating="+">+</div><div class="current-rating">' +
       this.rating +
-      '</div><div onclick=handleRating() role="button" data-rating="-">-</div>';
+      '</div><div onclick=Comment.updateScore() role="button" data-rating="-">-</div>';
 
     //create main content section
     let main_content_section = document.createElement('div');
     main_content_section.classList.add('main-content');
     main_content_section.innerHTML =
-      '<div class="comment-header"><img src=" ' +
+      '<div class="comment-header" data-id=' +
+      this.id +
+      '><img src=" ' +
       this.img +
       ' " alt=""><span class="nickname">' +
       this.nickname +
       '</span><span class="date">' +
       this.date +
-      '</span><span class="reply-btn" role="button">Reply</span></div><div class="comment-content">' +
+      '</span><span class="reply-btn" role="button" onclick=Comment.addReply(' +
+      this.id +
+      ')>Reply</span></div><div class="comment-content">' +
       this.content +
       '</div>';
 
@@ -81,6 +85,83 @@ class Comment {
         .appendChild(new_comment_element);
     }
   }
+  static updateScore() {
+    switch (event.target.dataset.rating) {
+      case '+':
+        if (event.target.parentElement.classList.contains('is-reply')) {
+          let parent_id =
+            event.target.parentElement.parentElement.parentElement.dataset
+              .parentId;
+          let cmm_id = event.target.parentElement.dataset.id;
+          commentsObj.comments.forEach((mainComment) => {
+            if (mainComment.id == parent_id) {
+              mainComment.replies.forEach((r) => {
+                if (r.id == cmm_id) r.score += 1;
+              });
+            }
+          });
+          event.target.parentElement.querySelector(
+            '.current-rating',
+          ).innerText =
+            +event.target.parentElement.querySelector('.current-rating')
+              .innerText + 1;
+        } else {
+          commentsObj.comments[
+            +event.target.parentElement.dataset.id - 1
+          ].score += 1;
+        }
+        break;
+      case '-':
+        if (event.target.parentElement.classList.contains('is-reply')) {
+          let parent_id =
+            event.target.parentElement.parentElement.parentElement.dataset
+              .parentId;
+          let cmm_id = event.target.parentElement.dataset.id;
+          commentsObj.comments.forEach((mainComment) => {
+            if (mainComment.id == parent_id) {
+              mainComment.replies.forEach((r) => {
+                if (r.id == cmm_id) r.score -= 1;
+              });
+            }
+          });
+          event.target.parentElement.querySelector(
+            '.current-rating',
+          ).innerText =
+            +event.target.parentElement.querySelector('.current-rating')
+              .innerText - 1;
+        } else {
+          commentsObj.comments[
+            +event.target.parentElement.dataset.id - 1
+          ].score -= 1;
+        }
+        break;
+    }
+    localStorage.setItem('commentsObj', JSON.stringify(commentsObj));
+    if (!event.target.parentElement.classList.contains('is-reply')) {
+      event.target.parentElement.querySelector('.current-rating').innerText =
+        commentsObj.comments[+event.target.parentElement.dataset.id - 1].score;
+    }
+  }
+  static addReply() {
+    let target_comment = document.querySelector(
+      `.comment-box[data-id="${event.target.parentElement.dataset.id}"]`,
+    );
+    let reply_box = document.createElement('div');
+    reply_box.classList.add('comment-box');
+
+    //defines if the reply box has a smaller size
+    target_comment.classList.contains('first-reply') &&
+      reply_box.classList.add('reply-box');
+
+    reply_box.innerHTML =
+      "<div class='inner-reply'><div class='avatar'><img src=" +
+      commentsObj.currentUser.image.png +
+      "></div><div class='reply-input'><input type='text'></div><div class='reply-send-btn'><button>Send</button></div></div>";
+    target_comment.parentElement.insertBefore(
+      reply_box,
+      target_comment.nextSibling,
+    );
+  }
 }
 
 let commentsObj;
@@ -95,6 +176,9 @@ if (localStorage.commentsObj) {
       renderElements(commentsObj);
     });
 }
+
+
+
 
 function renderElements(obj) {
   obj.comments.forEach((comment) => {
@@ -125,64 +209,4 @@ function renderElements(obj) {
       });
     }
   });
-}
-
-function handleRating() {
-  switch (event.target.dataset.rating) {
-    case '+':
-      if (event.target.parentElement.classList.contains('is-reply')) {
-        let parent_id =
-          event.target.parentElement.parentElement.parentElement.dataset
-            .parentId;
-        let cmm_id = event.target.parentElement.dataset.id;
-
-        commentsObj.comments.forEach((mainComment) => {
-          if (mainComment.id == parent_id) {
-            mainComment.replies.forEach((r) => {
-              if (r.id == cmm_id) r.score += 1;
-            });
-          }
-        });
-        event.target.parentElement.querySelector('.current-rating').innerText =
-          +event.target.parentElement.querySelector('.current-rating')
-            .innerText + 1;
-      } else {
-        commentsObj.comments[
-          +event.target.parentElement.dataset.id - 1
-        ].score += 1;
-      }
-      break;
-    case '-':
-      if (event.target.parentElement.classList.contains('is-reply')) {
-        let parent_id =
-          event.target.parentElement.parentElement.parentElement.dataset
-            .parentId;
-        let cmm_id = event.target.parentElement.dataset.id;
-
-        commentsObj.comments.forEach((mainComment) => {
-          if (mainComment.id == parent_id) {
-            mainComment.replies.forEach((r) => {
-              if (r.id == cmm_id) r.score -= 1;
-            });
-          }
-        });
-        event.target.parentElement.querySelector('.current-rating').innerText =
-          +event.target.parentElement.querySelector('.current-rating')
-            .innerText - 1;
-      } else {
-        commentsObj.comments[
-          +event.target.parentElement.dataset.id - 1
-        ].score -= 1;
-      }
-
-      break;
-  }
-  function updateScore() {}
-
-  localStorage.setItem('commentsObj', JSON.stringify(commentsObj));
-
-  if (!event.target.parentElement.classList.contains('is-reply')) {
-    event.target.parentElement.querySelector('.current-rating').innerText =
-      commentsObj.comments[+event.target.parentElement.dataset.id - 1].score;
-  }
 }
