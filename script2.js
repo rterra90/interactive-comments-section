@@ -1,20 +1,19 @@
 class Comment {
-  constructor(id, img, nickname, date, content, rating, replies) {
+  constructor(id, img, nickname, date, content, score, replies) {
     this.id = id;
     this.img = img;
     this.nickname = nickname;
-    this.date = date;
+    this.createdAt = date;
     this.content = content;
-    this.rating = rating;
+    this.score = score;
     this.replies = replies;
   }
   createCommentBox(context_id) {
     if (this.replies != undefined) {
-      /*Create a main comment context*/
       let new_comment_context = document.createElement('div');
       new_comment_context.classList.add('comment-context');
       new_comment_context.dataset.context = this.id;
-      /*Create a default box and a inner wrapper*/
+
       new_comment_context.innerHTML = `<div class="default-box" data-comment="main"><div class="inner-comment-box" data-comment-id=${this.id}></div></div>`;
 
       document
@@ -37,7 +36,7 @@ class Comment {
     rating_section.dataset.id = this.id;
     rating_section.innerHTML =
       '<div onclick=Comment.updateScore() role="button" data-rating="+">+</div><div class="current-rating">' +
-      this.rating +
+      this.score +
       '</div><div onclick=Comment.updateScore() role="button" data-rating="-">-</div>';
 
     document
@@ -55,7 +54,7 @@ class Comment {
       ' " alt=""><span class="nickname">' +
       this.nickname +
       '</span><span class="date">' +
-      this.date +
+      this.createdAt +
       '</span><span data-active=false class="reply-btn" role="button" onclick=Comment.createReplyComposerBox(' +
       this.id +
       ')><img src="./images/icon-reply.svg">Reply</span></div><div class="comment-content">' +
@@ -81,7 +80,9 @@ class Comment {
       reply_composer_box.innerHTML =
         "<div class='inner-reply'><div class='avatar'><img src=" +
         commentsObj.currentUser.image.png +
-        "></div><div class='reply-input'><textarea name='reply-input' rows='4'></textarea></div><div class='reply-send-btn'><button onclick=Comment.submitReply()>Send</button></div></div>";
+        "></div><div class='reply-input'><textarea name='reply-input' rows='4'></textarea></div><div class='reply-send-btn'><button onclick=Comment.submitReply(" +
+        comment_id +
+        ')>Send</button></div></div>';
 
       reply_composer_box.style.width =
         target_comment.parentElement.offsetWidth - 30 + 'px';
@@ -90,6 +91,7 @@ class Comment {
         reply_composer_box,
         target_comment.parentElement.nextElementSibling,
       );
+
       event.target.dataset.active = true;
     } else {
       document
@@ -129,10 +131,57 @@ class Comment {
     }
     localStorage.setItem('commentsObj', JSON.stringify(commentsObj));
   }
+  static submitReply(reply_to) {
+    let ref_comment = document.querySelector(
+      `.inner-comment-box[data-comment-id='${reply_to}']`,
+    );
+    let comment_content =
+      event.target.parentElement.parentElement.querySelector('textarea').value;
+    let comment_createdAt = () => {
+      // let now = new Date();
+      // return now.getTime();
+      return 'today';
+    };
+
+    let submmited_comment_object = {
+      id: (idCounter += 1),
+      content: comment_content,
+      createdAt: comment_createdAt(),
+      score: 0,
+      replyingTo: ref_comment.querySelector('.nickname').innerText,
+      user: commentsObj.currentUser,
+    };
+    let new_reply = new Comment(
+      submmited_comment_object.id,
+      submmited_comment_object.user.image.png,
+      submmited_comment_object.user.username,
+      submmited_comment_object.createdAt,
+      submmited_comment_object.content,
+      submmited_comment_object.score,
+    );
+    new_reply.createCommentBox(reply_to);
+
+    commentsObj.comments.forEach((mainComment) => {
+      if (mainComment.id == reply_to) {
+        mainComment.replies.push(new_reply);
+      }
+    });
+    console.log(commentsObj);
+    localStorage.setItem('commentsObj', JSON.stringify(commentsObj));
+
+    document
+      .querySelector(`.comment-composer[data-replied-comment='${reply_to}']`)
+      .remove();
+    document.querySelector(
+      `.inner-comment-box .reply-btn`,
+    ).dataset.active = false;
+    // console.log(new_reply);
+  }
 }
 
 //
 //create a global comments object from JSON or from localStorage
+let idCounter = 0;
 let commentsObj;
 if (localStorage.commentsObj) {
   commentsObj = JSON.parse(localStorage.commentsObj);
@@ -152,6 +201,7 @@ if (localStorage.commentsObj) {
 //function that renders comments elements from Comment class
 function renderElements(obj) {
   obj.comments.forEach((comment) => {
+    idCounter += 1;
     let new_comment = new Comment(
       comment.id,
       comment.user.image.png,
@@ -167,6 +217,7 @@ function renderElements(obj) {
     if (comment.replies.length > 0) {
       let context_id = comment.id;
       comment.replies.forEach((r) => {
+        idCounter += 1;
         let reply = new Comment(
           r.id,
           r.user.image.png,

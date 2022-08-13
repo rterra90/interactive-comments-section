@@ -13,6 +13,13 @@
 </head>
 
 <body>
+  <button onclick=resetAll()>RESET</button>
+  <script>
+    function resetAll() {
+      localStorage.removeItem('commentsObj')
+      location.reload()
+    }
+  </script>
   <section class="" id="page-wrapper">
     <div id="comments-section-wrapper">
     </div>
