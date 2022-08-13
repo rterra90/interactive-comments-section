@@ -56,7 +56,7 @@ class Comment {
       this.nickname +
       '</span><span class="date">' +
       this.date +
-      '</span><span data-active=false class="reply-btn" role="button" onclick=Comment.addReply(' +
+      '</span><span data-active=false class="reply-btn" role="button" onclick=Comment.createReplyComposerBox(' +
       this.id +
       ')><img src="./images/icon-reply.svg">Reply</span></div><div class="comment-content">' +
       this.content +
@@ -65,7 +65,41 @@ class Comment {
       .querySelector(`.inner-comment-box[data-comment-id='${this.id}']`)
       .appendChild(main_content_section);
   }
-  createReplyComposerBox() {}
+  static createReplyComposerBox(comment_id) {
+    if (event.target.dataset.active == 'false') {
+      let target_comment = document.querySelector(
+        `.inner-comment-box[data-comment-id="${comment_id}"]`,
+      );
+
+      let reply_composer_box = document.createElement('div');
+      reply_composer_box.classList.add(
+        'default-box',
+        'reply-composer',
+        'comment-composer',
+      );
+      reply_composer_box.dataset.repliedComment = comment_id;
+      reply_composer_box.innerHTML =
+        "<div class='inner-reply'><div class='avatar'><img src=" +
+        commentsObj.currentUser.image.png +
+        "></div><div class='reply-input'><textarea name='reply-input' rows='4'></textarea></div><div class='reply-send-btn'><button onclick=Comment.submitReply()>Send</button></div></div>";
+
+      reply_composer_box.style.width =
+        target_comment.parentElement.offsetWidth - 30 + 'px';
+
+      target_comment.parentElement.parentElement.insertBefore(
+        reply_composer_box,
+        target_comment.parentElement.nextElementSibling,
+      );
+      event.target.dataset.active = true;
+    } else {
+      document
+        .querySelector(
+          `.comment-composer[data-replied-comment='${comment_id}']`,
+        )
+        .remove();
+      event.target.dataset.active = false;
+    }
+  }
   static updateScore() {
     let rating_id = event.target.parentElement.dataset.id;
     if (
