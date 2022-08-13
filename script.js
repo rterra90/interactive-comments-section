@@ -47,9 +47,9 @@ class Comment {
       this.nickname +
       '</span><span class="date">' +
       this.date +
-      '</span><span class="reply-btn" role="button" onclick=Comment.addReply(' +
+      '</span><span data-active=false class="reply-btn" role="button" onclick=Comment.addReply(' +
       this.id +
-      ')>Reply</span></div><div class="comment-content">' +
+      ')><img src="./images/icon-reply.svg">Reply</span></div><div class="comment-content">' +
       this.content +
       '</div>';
 
@@ -143,24 +143,51 @@ class Comment {
     }
   }
   static addReply() {
-    let target_comment = document.querySelector(
-      `.comment-box[data-id="${event.target.parentElement.dataset.id}"]`,
-    );
-    let reply_box = document.createElement('div');
-    reply_box.classList.add('comment-box');
+    if(event.target.dataset.active == "false"){
+      let target_comment = document.querySelector(
+          `.comment-box[data-id="${event.target.parentElement.dataset.id}"]`,
+        );
+        let reply_box = document.createElement('div');
+        reply_box.classList.add('comment-box');
+        reply_box.classList.add('reply-composer');
 
-    //defines if the reply box has a smaller size
-    target_comment.classList.contains('first-reply') &&
-      reply_box.classList.add('reply-box');
+        event.target.dataset.active = true;
 
-    reply_box.innerHTML =
-      "<div class='inner-reply'><div class='avatar'><img src=" +
-      commentsObj.currentUser.image.png +
-      "></div><div class='reply-input'><textarea name='reply-input' rows='4'></textarea></div><div class='reply-send-btn'><button>Send</button></div></div>";
-    target_comment.parentElement.insertBefore(
-      reply_box,
-      target_comment.nextSibling,
-    );
+        //defines if the reply box has a smaller size
+        target_comment.classList.contains('first-reply') &&
+          reply_box.classList.add('reply-box');
+
+          if(target_comment.dataset.parentId){
+            refComment = target_comment.dataset.parentId
+          } else {
+           refComment = target_comment.dataset.id
+          }
+
+
+        reply_box.innerHTML =
+          "<div class='inner-reply'><div class='avatar'><img src=" +
+          commentsObj.currentUser.image.png +
+          "></div><div class='reply-input'><textarea name='reply-input' rows='4'></textarea></div><div class='reply-send-btn'><button onclick=Comment.submitReply()>Send</button></div></div>";
+        
+
+
+        target_comment.parentElement.insertBefore(
+          reply_box,
+          target_comment.nextSibling,
+        );
+
+    } else{
+      event.target.dataset.active = false;
+      document.querySelector(`.comment-box[data-id="${event.target.parentElement.dataset.id}"]`).nextElementSibling.remove();
+    }
+    
+  } 
+  static submitReply(){
+
+
+
+
+
   }
 }
 
@@ -169,7 +196,7 @@ if (localStorage.commentsObj) {
   commentsObj = JSON.parse(localStorage.commentsObj);
   renderElements(commentsObj);
 } else {
-  fetch('/data.json')
+  fetch('./data.json')
     .then((response) => response.json())
     .then((commentsJSON) => {
       commentsObj = commentsJSON;
@@ -179,7 +206,7 @@ if (localStorage.commentsObj) {
 
 function renderElements(obj) {
   obj.comments.forEach((comment) => {
-    let comm = new Comment(
+    let new_comment = new Comment(
       comment.id,
       comment.user.image.png,
       comment.user.username,
@@ -188,7 +215,7 @@ function renderElements(obj) {
       comment.score,
       comment.replies.length,
     );
-    comm.element('main');
+    new_comment.element('main');
 
     //check if the comment has replies to render
     if (comment.replies.length > 0) {
