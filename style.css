@@ -117,7 +117,20 @@ margin: 10px 0;
   border: var(--defaultblue) 1px solid;
   padding: 5px 10px
 }
-
+.delete-btn{
+  margin: 0 0 0 auto;
+  font-size: .8rem;
+  font-weight: 500;
+  color: #ED6368;
+  display: flex;
+  gap: 5px;
+  opacity: .25;
+  transition: .3s;
+  cursor: pointer;
+}
+.delete-btn:hover{
+  opacity: 1;
+}
 .reply-composer{
   margin-top: 10px;
   /* width: 100% */

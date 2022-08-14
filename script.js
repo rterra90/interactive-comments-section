@@ -59,6 +59,25 @@ class Comment {
       ')><img src="./images/icon-reply.svg">Reply</span></div><div class="comment-content">' +
       this.content +
       '</div>';
+
+    // create delete button
+    if (this.user.username == commentsObj.currentUser.username) {
+      let deleteSpan = document.createElement('span');
+      deleteSpan.classList.add('delete-btn');
+      deleteSpan.dataset.id = this.id;
+      deleteSpan.innerHTML =
+        '<img src="./images/icon-delete.svg"><a>Delete</a>';
+      main_content_section
+        .querySelector('.comment-header')
+        .insertBefore(
+          deleteSpan,
+          main_content_section.querySelector('.reply-btn'),
+        );
+      main_content_section.querySelector(
+        '.comment-header .reply-btn',
+      ).style.margin = '0 0 0 20px';
+    }
+
     document
       .querySelector(`.inner-comment-box[data-comment-id='${this.id}']`)
       .appendChild(main_content_section);
@@ -157,21 +176,10 @@ class Comment {
         ).value;
     }
 
-    // let comment_content = `${
-    //   '@user' +
-    //   event.target.parentElement.parentElement.querySelector('textarea').value
-    // } `;
-
-    let comment_createdAt = () => {
-      // let now = new Date();
-      // return now.getTime();
-      return 'today';
-    };
-
     let submmited_comment_object = {
       id: (idCounter += 1),
       content: comment_content,
-      createdAt: comment_createdAt(),
+      createdAt: 'today',
       score: 0,
       replyingTo: context_main_comment.querySelector('.nickname').innerText,
       user: commentsObj.currentUser,
@@ -199,6 +207,7 @@ class Comment {
       `.inner-comment-box[data-comment-id='${event.target.dataset.replyingTo}'] .reply-btn`,
     ).dataset.active = false;
   }
+  static deleteComment() {}
 }
 
 //
