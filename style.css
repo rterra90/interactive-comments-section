@@ -82,6 +82,7 @@ margin: 10px 0;
   font-size: .8rem;
   font-weight: 500;
   margin: 0 0 0 auto;
+  user-select: none;
 }
 .comment-header .reply-btn img{
   margin-right: 6px;
@@ -110,23 +111,31 @@ margin: 10px 0;
 .inner-reply .reply-input{
   padding: 0 20px;
 }
-.inner-reply .reply-input textarea{
-  width: 100%;
+textarea{
   min-height: 75px;
-  border-radius: 10px;
+  border-radius: 6px;
   border: var(--defaultblue) 1px solid;
   padding: 5px 10px
+}
+.reply-input textarea{
+  width: 100%;
+}
+.edit-input{
+  width: 95%;
 }
 .delete-btn{
   margin: 0 0 0 auto;
   font-size: .8rem;
   font-weight: 500;
   color: #ED6368;
-  display: flex;
-  gap: 5px;
+
   opacity: .25;
   transition: .3s;
   cursor: pointer;
+}
+.delete-btn > div{
+  display: flex;
+  gap: 5px;
 }
 .delete-btn:hover{
   opacity: 1;
@@ -139,8 +148,11 @@ margin: 10px 0;
   animation-fill-mode: forwards;
 }
 @keyframes elementIn {
-  from{
-    margin-top: -15px;
+  0%{
+    margin-top: -121px;
+    opacity: 0;
+  }
+  40%{
     opacity: 0;
   }
   to{
@@ -149,11 +161,14 @@ margin: 10px 0;
   }
 }
 @keyframes elementOut {
-  from{
+  0%{
     margin-top: 10px;
   }
+  30%{
+    opacity: 0;
+  }
   to{
-    margin-top: -15px;
+    margin-top: -121px;
     opacity: 0;
   }
 }

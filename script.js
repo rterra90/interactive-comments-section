@@ -54,9 +54,7 @@ class Comment {
       this.user.username +
       '</span><span class="date">' +
       this.createdAt +
-      '</span><span data-active=false class="reply-btn" role="button" onclick=Comment.createReplyComposerBox(' +
-      this.id +
-      ')><img src="./images/icon-reply.svg">Reply</span></div><div class="comment-content">' +
+      '</span></div><div class="comment-content">' +
       this.content +
       '</div>';
 
@@ -66,17 +64,35 @@ class Comment {
       deleteSpan.classList.add('delete-btn');
       deleteSpan.dataset.id = this.id;
       deleteSpan.innerHTML =
-        '<img src="./images/icon-delete.svg"><a>Delete</a>';
+        '<div onclick=Comment.deleteComment()><img src="./images/icon-delete.svg"><a>Delete</a></div>';
+
       main_content_section
         .querySelector('.comment-header')
-        .insertBefore(
-          deleteSpan,
-          main_content_section.querySelector('.reply-btn'),
-        );
-      main_content_section.querySelector(
-        '.comment-header .reply-btn',
-      ).style.margin = '0 0 0 20px';
+        .appendChild(deleteSpan);
+
+      let editSpan = document.createElement('span');
+      editSpan.innerHTML =
+        '<span data-active=false class="reply-btn" role="button" onclick=Comment.editComment(' +
+        this.id +
+        ')><img src="./images/icon-edit.svg">Edit</span>';
+      main_content_section
+        .querySelector('.comment-header')
+        .appendChild(editSpan);
+    } else {
+      let replySpan = document.createElement('span');
+      replySpan.innerHTML =
+        '<span data-active=false class="reply-btn" role="button" onclick=Comment.createReplyComposerBox(' +
+        this.id +
+        ')><img src="./images/icon-reply.svg">Reply</span>';
+      main_content_section
+        .querySelector('.comment-header')
+        .appendChild(replySpan);
     }
+    main_content_section.querySelector(
+      '.comment-header .reply-btn',
+    ).parentElement.style.margin = '0 0 0 auto';
+
+    //create reply or edit button
 
     document
       .querySelector(`.inner-comment-box[data-comment-id='${this.id}']`)
@@ -161,20 +177,11 @@ class Comment {
     let ref_comment = document.querySelector(
       `[data-comment-id='${event.target.dataset.replyingTo}']`,
     );
-    let comment_content;
-    if (ref_comment.hasAttribute('data-context')) {
-      comment_content =
-        '<b>@' +
-        ref_comment.querySelector('.nickname').innerText +
-        '</b> ' +
-        event.target.parentElement.parentElement.querySelector('textarea')
-          .value;
-    } else {
-      comment_content =
-        event.target.parentElement.parentElement.querySelector(
-          'textarea',
-        ).value;
-    }
+    let comment_content =
+      '<b>@' +
+      ref_comment.querySelector('.nickname').innerText +
+      '</b> ' +
+      event.target.parentElement.parentElement.querySelector('textarea').value;
 
     let submmited_comment_object = {
       id: (idCounter += 1),
@@ -207,7 +214,35 @@ class Comment {
       `.inner-comment-box[data-comment-id='${event.target.dataset.replyingTo}'] .reply-btn`,
     ).dataset.active = false;
   }
-  static deleteComment() {}
+  static deleteComment() {
+    console.log(event.target.parentElement.parentElement);
+  }
+  static editComment(target_id) {
+    let _targetElement = event.target.hasAttribute('data-active')
+      ? event.target
+      : event.target.parentElement;
+
+    let target_comment = document.querySelector(
+      `[data-comment-id='${target_id}']`,
+    );
+
+    if (_targetElement.dataset.active == 'false') {
+      target_comment.querySelector('.comment-content').style.display = 'none';
+
+      let edit_textarea = document.createElement('textarea');
+      edit_textarea.classList.add('edit-input');
+      edit_textarea.rows = 4;
+      edit_textarea.value =
+        target_comment.querySelector('.comment-content').innerText;
+      target_comment.querySelector('.main-content').appendChild(edit_textarea);
+
+      _targetElement.dataset.active = true;
+    } else {
+      target_comment.querySelector('textarea').remove();
+      target_comment.querySelector('.comment-content').style.display = 'block';
+      _targetElement.dataset.active = false;
+    }
+  }
 }
 
 //
@@ -232,7 +267,7 @@ if (localStorage.commentsObj) {
 //function that renders comments elements from Comment class
 function renderElements(obj) {
   obj.comments.forEach((comment) => {
-    idCounter += 1;
+    comment.id > idCounter && (idCounter = comment.id);
     let new_comment = new Comment(
       comment.id,
       comment.user,
@@ -247,6 +282,7 @@ function renderElements(obj) {
     if (comment.replies.length > 0) {
       let context_id = comment.id;
       comment.replies.forEach((r) => {
+        r.id > idCounter && (idCounter = r.id);
         idCounter += 1;
         let reply = new Comment(r.id, r.user, r.createdAt, r.content, r.score);
         reply.createCommentBox(context_id);
