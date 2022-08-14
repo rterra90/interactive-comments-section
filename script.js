@@ -92,11 +92,17 @@ class Comment {
 
       event.target.dataset.active = true;
     } else {
-      document
-        .querySelector(
-          `.comment-composer[data-replied-comment='${comment_id}']`,
-        )
-        .remove();
+      document.querySelector(
+        `.comment-composer[data-replied-comment='${comment_id}']`,
+      ).style.animationName = 'elementOut';
+      setTimeout(() => {
+        document
+          .querySelector(
+            `.comment-composer[data-replied-comment='${comment_id}']`,
+          )
+          .remove();
+      }, 300);
+
       event.target.dataset.active = false;
     }
   }
@@ -176,8 +182,11 @@ class Comment {
     event.target.parentElement.parentElement.parentElement.remove();
 
     document.querySelector(
-      `.inner-comment-box .reply-btn`,
+      `.inner-comment-box[data-comment-id='${reply_to}'] .reply-btn`,
     ).dataset.active = false;
+    document.querySelector(
+      `.inner-comment-box[data-comment-id='${reply_to}'] .reply-btn`,
+    ).innerText = 'Reply';
   }
 }
 

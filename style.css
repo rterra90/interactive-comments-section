@@ -84,7 +84,11 @@ margin: 10px 0;
   margin: 0 0 0 auto;
 }
 .comment-header .reply-btn img{
-  margin-right: 6px
+  margin-right: 6px;
+  transition: .5s;
+}
+.comment-header .reply-btn[data-active=true] img{
+  transform: rotate3d(0, 1, 0, 180deg);
 }
 .comment-content{
   font-size: 15px;
@@ -117,4 +121,26 @@ margin: 10px 0;
 .reply-composer{
   margin-top: 10px;
   /* width: 100% */
+  animation-name: elementIn;
+  animation-duration: .3s;
+  animation-fill-mode: forwards;
+}
+@keyframes elementIn {
+  from{
+    margin-top: -15px;
+    opacity: 0;
+  }
+  to{
+    margin-top: 10px;
+    opacity: 1;
+  }
+}
+@keyframes elementOut {
+  from{
+    margin-top: 10px;
+  }
+  to{
+    margin-top: -15px;
+    opacity: 0;
+  }
 }
