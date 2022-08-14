@@ -77,10 +77,10 @@ class Comment {
         'comment-composer',
       );
       reply_composer_box.dataset.repliedComment = comment_id;
-      let n = target_comment.hasAttribute('data-context')
+      let reply_context = target_comment.hasAttribute('data-context')
         ? target_comment.dataset.context
         : comment_id;
-      reply_composer_box.innerHTML = `<div class='inner-reply'><div class='avatar'><img src=${commentsObj.currentUser.image.png}></div><div class='reply-input'><textarea name='reply-input' rows='4'></textarea></div><div class='reply-send-btn'><button onclick=Comment.submitReply(${n})>Send</button></div></div>`;
+      reply_composer_box.innerHTML = `<div class='inner-reply'><div class='avatar'><img src=${commentsObj.currentUser.image.png}></div><div class='reply-input'><textarea name='reply-input' rows='4'></textarea></div><div class='reply-send-btn'><button onclick=Comment.submitReply(${reply_context}) data-replying-to=${comment_id}>Send</button></div></div>`;
 
       reply_composer_box.style.width =
         target_comment.parentElement.offsetWidth - 30 + 'px';
@@ -135,13 +135,27 @@ class Comment {
     }
     localStorage.setItem('commentsObj', JSON.stringify(commentsObj));
   }
-  static submitReply(reply_to, replied_comment) {
-    let ref_comment = document.querySelector(
-      `.inner-comment-box[data-comment-id='${reply_to}']`,
+  static submitReply(reply_context) {
+    let context_main_comment = document.querySelector(
+      `.inner-comment-box[data-comment-id='${reply_context}']`,
     );
-    // ref_comment.hasAttribute('data-context') && console.log('vai mention');
-    let comment_content =
-      event.target.parentElement.parentElement.querySelector('textarea').value;
+    let ref_comment = document.querySelector(
+      `[data-comment-id='${event.target.dataset.replyingTo}']`,
+    );
+    let comment_content;
+    if (ref_comment.hasAttribute('data-context')) {
+      comment_content =
+        '<b>@' +
+        ref_comment.querySelector('.nickname').innerText +
+        '</b> ' +
+        event.target.parentElement.parentElement.querySelector('textarea')
+          .value;
+    } else {
+      comment_content =
+        event.target.parentElement.parentElement.querySelector(
+          'textarea',
+        ).value;
+    }
 
     // let comment_content = `${
     //   '@user' +
@@ -159,7 +173,7 @@ class Comment {
       content: comment_content,
       createdAt: comment_createdAt(),
       score: 0,
-      replyingTo: ref_comment.querySelector('.nickname').innerText,
+      replyingTo: context_main_comment.querySelector('.nickname').innerText,
       user: commentsObj.currentUser,
     };
     let new_reply = new Comment(
@@ -170,10 +184,10 @@ class Comment {
       submmited_comment_object.score,
     );
 
-    new_reply.createCommentBox(reply_to);
+    new_reply.createCommentBox(reply_context);
 
     commentsObj.comments.forEach((mainComment) => {
-      if (mainComment.id == reply_to) {
+      if (mainComment.id == reply_context) {
         mainComment.replies.push(new_reply);
       }
     });
@@ -182,11 +196,8 @@ class Comment {
     event.target.parentElement.parentElement.parentElement.remove();
 
     document.querySelector(
-      `.inner-comment-box[data-comment-id='${reply_to}'] .reply-btn`,
+      `.inner-comment-box[data-comment-id='${event.target.dataset.replyingTo}'] .reply-btn`,
     ).dataset.active = false;
-    document.querySelector(
-      `.inner-comment-box[data-comment-id='${reply_to}'] .reply-btn`,
-    ).innerText = 'Reply';
   }
 }
 
