@@ -15,13 +15,21 @@ class Comment {
 
       new_comment_context.innerHTML = `<div class="default-box" data-comment="main"><div class="inner-comment-box" data-comment-id=${this.id}></div></div>`;
 
-      document
-        .querySelector('#comments-section-wrapper')
-        .appendChild(new_comment_context);
+      if (document.querySelector('#comments-section-wrapper .add-comment')) {
+        document
+          .querySelector('#comments-section-wrapper')
+          .insertBefore(
+            new_comment_context,
+            document.querySelector('#comments-section-wrapper .add-comment'),
+          );
+      } else {
+        document
+          .querySelector('#comments-section-wrapper')
+          .appendChild(new_comment_context);
+      }
     } else {
       let new_reply_box = document.createElement('div');
       new_reply_box.classList.add('default-box');
-      // new_reply_box.dataset.contextId = this.id;
       new_reply_box.dataset.comment = 'reply';
       new_reply_box.innerHTML = `<div class='inner-comment-box' data-context='${context_id}' data-comment-id=${this.id}></div>`;
       document
@@ -64,7 +72,11 @@ class Comment {
       deleteSpan.classList.add('delete-btn');
       deleteSpan.dataset.id = this.id;
       deleteSpan.innerHTML =
-        '<div onclick=Comment.deleteComment()><img src="./images/icon-delete.svg"><a>Delete</a></div>';
+        '<div onclick=Comment.deleteComment(' +
+        this.id +
+        ') data-id=' +
+        this.id +
+        '><img src="./images/icon-delete.svg"><a>Delete</a></div>';
 
       main_content_section
         .querySelector('.comment-header')
@@ -80,6 +92,7 @@ class Comment {
         .appendChild(editSpan);
     } else {
       let replySpan = document.createElement('span');
+      replySpan.classList.add('reply-btn-wrapper');
       replySpan.innerHTML =
         '<span data-active=false class="reply-btn" role="button" onclick=Comment.createReplyComposerBox(' +
         this.id +
@@ -88,9 +101,9 @@ class Comment {
         .querySelector('.comment-header')
         .appendChild(replySpan);
     }
-    main_content_section.querySelector(
-      '.comment-header .reply-btn',
-    ).parentElement.style.margin = '0 0 0 auto';
+    // main_content_section.querySelector(
+    //   '.comment-header .reply-btn',
+    // ).parentElement.style.margin = '0 0 0 auto';
 
     //create reply or edit button
 
@@ -98,12 +111,46 @@ class Comment {
       .querySelector(`.inner-comment-box[data-comment-id='${this.id}']`)
       .appendChild(main_content_section);
   }
+  static addCommentBox() {
+    let add_comment = document.createElement('div');
+    add_comment.classList.add('default-box', 'comment-composer', 'add-comment');
+
+    add_comment.innerHTML = `<div class='inner-reply'><div class='avatar'><img src=${commentsObj.currentUser.image.png}></div><div class='reply-input'><textarea name='reply-input' rows='4'></textarea></div><div class='reply-send-btn'><button onClick=Comment.submitNewComment() >Send</button></div></div>`;
+
+    document
+      .querySelector('#comments-section-wrapper')
+      .appendChild(add_comment);
+  }
+  static submitNewComment() {
+    let new_comment_obj = {
+      id: (idCounter += 1),
+      content:
+        event.target.parentElement.parentElement.querySelector('textarea')
+          .value,
+      createdAt: 'today',
+      score: 0,
+      user: commentsObj.currentUser,
+      replies: [],
+    };
+    let new_comment = new Comment(
+      new_comment_obj.id,
+      new_comment_obj.user,
+      new_comment_obj.createdAt,
+      new_comment_obj.content,
+      new_comment_obj.score,
+      new_comment_obj.replies,
+    );
+    new_comment.createCommentBox();
+
+    //Find the comment in the global comments object and update content
+    commentsObj.comments.push(new_comment_obj);
+    localStorage.setItem('commentsObj', JSON.stringify(commentsObj));
+  }
   static createReplyComposerBox(comment_id) {
     if (event.target.dataset.active == 'false') {
       let target_comment = document.querySelector(
         `.inner-comment-box[data-comment-id="${comment_id}"]`,
       );
-      // target_comment.hasAttribute('data-context') && console.log('reply');
 
       let reply_composer_box = document.createElement('div');
       reply_composer_box.classList.add(
@@ -214,8 +261,8 @@ class Comment {
       `.inner-comment-box[data-comment-id='${event.target.dataset.replyingTo}'] .reply-btn`,
     ).dataset.active = false;
   }
-  static deleteComment() {
-    console.log(event.target.parentElement.parentElement);
+  static deleteComment(target_id) {
+    console.log(target_id);
   }
   static editComment(target_id) {
     let _targetElement = event.target.hasAttribute('data-active')
@@ -322,6 +369,7 @@ function renderElements(obj) {
       });
     }
   });
+  let add_comment_box = Comment.addCommentBox();
 }
 //END function that renders comments elements from Comment class
 //

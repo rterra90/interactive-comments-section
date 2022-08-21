@@ -46,6 +46,10 @@ margin: 10px 0;
 .default-box[data-comment="reply"]{
   width: 85%;
 }
+.default-box[data-comment="main"]{
+ align-self: normal
+ ;
+}
 .inner-comment-box{
   display: flex;
 }
@@ -95,6 +99,9 @@ margin: 10px 0;
   margin-left: 16px;
   font-weight: 600;
 }
+.reply-btn-wrapper{
+  margin: 0 0 0 auto;
+}
 .comment-header .reply-btn{
   font-size: .8rem;
   font-weight: 500;
@@ -141,7 +148,7 @@ textarea{
   width: 95%;
 }
 .delete-btn{
-  margin: 0 0 0 auto;
+  margin: 0 20px 0 auto;
   font-size: .8rem;
   font-weight: 500;
   color: #ED6368;
@@ -159,7 +166,6 @@ textarea{
 }
 .reply-composer{
   margin-top: 10px;
-  /* width: 100% */
   animation-name: elementIn;
   animation-duration: .3s;
   animation-fill-mode: forwards;
