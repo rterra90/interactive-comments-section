@@ -5,6 +5,8 @@
 body{
   background-color: var(--lightwheat);
   font-family: 'Rubik', sans-serif;
+  position: relative;
+  margin: 0
 }
 button{
   background-color: #5357BA;
@@ -194,4 +196,43 @@ textarea{
     margin-top: -121px;
     opacity: 0;
   }
+}
+.delete-modal{
+  height: 100vh;
+  width: 100%;
+  background-color: rgba(110, 110, 110, 0.55);
+  position: sticky;
+  z-index: 1000;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.delete-modal-alert{
+  width: 260px;
+  margin: 0 auto;
+  background-color: white;
+  padding: 25px;
+  border-radius: 8px;
+}
+.delete-modal-alert span{
+  display: block;
+  font-size: 1.25rem;
+}
+.delete-modal-alert p{
+  color:hsl(213, 9%, 40%);
+  font-size: .85rem;
+}
+.delete-modal-alert .buttons{
+  display: flex;
+  justify-content: space-between;
+}
+.delete-modal-alert button{
+  display: inline-block;
+  width: 47%;
+  margin: 0%;
+}
+.modal-active{
+  overflow: hidden;
+  /* height: 100vh; */
 }

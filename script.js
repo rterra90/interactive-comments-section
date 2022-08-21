@@ -101,9 +101,6 @@ class Comment {
         .querySelector('.comment-header')
         .appendChild(replySpan);
     }
-    // main_content_section.querySelector(
-    //   '.comment-header .reply-btn',
-    // ).parentElement.style.margin = '0 0 0 auto';
 
     //create reply or edit button
 
@@ -262,7 +259,43 @@ class Comment {
     ).dataset.active = false;
   }
   static deleteComment(target_id) {
-    console.log(target_id);
+    let delete_modal = document.createElement('div');
+    delete_modal.classList.add('delete-modal');
+    delete_modal.innerHTML = `<div class="delete-modal-alert"><span>Delete comment</span><p>Are you sure you want to delete this comment? This will remove the comment and can't be undone.</p><div class="buttons"><button data-value="no">No, cancel</button><button data-value="yes">Yes, delete</button></div></div>`;
+    document.querySelector('body').classList.add('modal-active');
+    document.querySelector('body').appendChild(delete_modal);
+    document.querySelectorAll('.delete-modal button').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        if (event.target.dataset.value == 'no') {
+          document.querySelector('body').classList.remove('modal-active');
+          document.querySelector('.delete-modal').remove();
+        } else {
+          let target_comment = document.querySelector(
+            `.inner-comment-box[data-comment-id="${target_id}"]`,
+          );
+          if (target_comment.hasAttribute('data-context')) {
+            target_comment.parentElement.remove();
+          } else {
+            target_comment.parentElement.parentElement.remove();
+          }
+          document.querySelector('body').classList.remove('modal-active');
+          document.querySelector('.delete-modal').remove();
+
+          commentsObj.comments.forEach((comment, i, this_array) => {
+            if (comment.id == target_id) {
+              this_array.splice(i, 1);
+            } else if (comment.replies.length > 0) {
+              comment.replies.forEach((reply, j, thisArray) => {
+                if (reply.id == target_id) {
+                  thisArray.splice(j, 1);
+                }
+              });
+            }
+          }),
+            localStorage.setItem('commentsObj', JSON.stringify(commentsObj));
+        }
+      });
+    });
   }
   static editComment(target_id) {
     let _targetElement = event.target.hasAttribute('data-active')
