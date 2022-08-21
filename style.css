@@ -6,7 +6,24 @@ body{
   background-color: var(--lightwheat);
   font-family: 'Rubik', sans-serif;
 }
-
+button{
+  background-color: #5357BA;
+  width: 82%;
+  margin: 0 auto;
+  display: block;
+  border: none;
+  color: white;
+  text-transform: uppercase;
+  padding: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: .2s;
+  font-size: .75rem;
+  font-weight: 500
+}
+button:hover{
+  background-color: #a6a8d4;
+}
 [role="button"]{
   cursor: pointer;
 }
@@ -103,7 +120,7 @@ margin: 10px 0;
 }
 .inner-reply{
   display: grid;
-  grid-template-columns: 42px 1fr 88px;
+  grid-template-columns: 42px 1fr 100px;
 }
 .inner-reply .avatar img{
   width: 100%;

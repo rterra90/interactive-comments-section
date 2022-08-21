@@ -115,7 +115,7 @@ class Comment {
       let reply_context = target_comment.hasAttribute('data-context')
         ? target_comment.dataset.context
         : comment_id;
-      reply_composer_box.innerHTML = `<div class='inner-reply'><div class='avatar'><img src=${commentsObj.currentUser.image.png}></div><div class='reply-input'><textarea name='reply-input' rows='4'></textarea></div><div class='reply-send-btn'><button onclick=Comment.submitReply(${reply_context}) data-replying-to=${comment_id}>Send</button></div></div>`;
+      reply_composer_box.innerHTML = `<div class='inner-reply'><div class='avatar'><img src=${commentsObj.currentUser.image.png}></div><div class='reply-input'><textarea name='reply-input' rows='4'></textarea></div><div class='reply-send-btn'><button onclick=Comment.submitReply(${reply_context}) data-replying-to=${comment_id}>Reply</button></div></div>`;
 
       reply_composer_box.style.width =
         target_comment.parentElement.offsetWidth - 30 + 'px';
@@ -234,13 +234,46 @@ class Comment {
       edit_textarea.rows = 4;
       edit_textarea.value =
         target_comment.querySelector('.comment-content').innerText;
+
       target_comment.querySelector('.main-content').appendChild(edit_textarea);
 
       _targetElement.dataset.active = true;
+
+      let edit_textarea_submit = document.createElement('button');
+      edit_textarea_submit.innerText = 'Update';
+
+      edit_textarea_submit.addEventListener('click', () => {
+        let new_value = edit_textarea.value;
+        target_comment.querySelector('.comment-content').innerText = new_value;
+        target_comment.querySelector('.comment-content').style.display =
+          'block';
+        _targetElement.dataset.active = false;
+        edit_textarea.remove();
+        edit_textarea_submit.remove();
+
+        //Find the comment in the global comments object and update content
+        commentsObj.comments.forEach((comment) => {
+          if (comment.id == target_id) {
+            comment.content = new_value;
+          } else if (comment.replies.length > 0) {
+            comment.replies.forEach((reply) => {
+              if (reply.id == target_id) {
+                reply.content = new_value;
+              }
+            });
+          }
+        }),
+          localStorage.setItem('commentsObj', JSON.stringify(commentsObj));
+      });
+
+      target_comment
+        .querySelector('.main-content')
+        .appendChild(edit_textarea_submit);
     } else {
-      target_comment.querySelector('textarea').remove();
-      target_comment.querySelector('.comment-content').style.display = 'block';
       _targetElement.dataset.active = false;
+      target_comment.querySelector('textarea').remove();
+      target_comment.querySelector('button').remove();
+      target_comment.querySelector('.comment-content').style.display = 'block';
     }
   }
 }
