@@ -27,6 +27,7 @@ class Comment {
           .querySelector('#comments-section-wrapper')
           .appendChild(new_comment_context);
       }
+      this.replies > 0 && new_comment_context.classList.add('has-replies');
     } else {
       let new_reply_box = document.createElement('div');
       new_reply_box.classList.add('default-box');
@@ -107,6 +108,14 @@ class Comment {
     document
       .querySelector(`.inner-comment-box[data-comment-id='${this.id}']`)
       .appendChild(main_content_section);
+
+    this.replies > 0 &&
+      (document.querySelector(
+        `.comment-context[data-context='${this.id}']`,
+      ).dataset.height =
+        document.querySelector(
+          `.comment-context[data-context='${this.id}'] .default-box`,
+        ).offsetHeight + 'px');
   }
   static addCommentBox() {
     let add_comment = document.createElement('div');
@@ -190,12 +199,16 @@ class Comment {
     if (
       !event.target.parentElement.parentElement.hasAttribute('data-context')
     ) {
-      commentsObj.comments[+rating_id - 1].score +=
-        event.target.dataset.rating == '+' ? 1 : -1;
+      commentsObj.comments.forEach((comment) => {
+        if (comment.id == rating_id) {
+          comment.score += event.target.dataset.rating == '+' ? 1 : -1;
 
-      /* Update score */
-      event.target.parentElement.querySelector('.current-rating').innerText =
-        commentsObj.comments[+event.target.parentElement.dataset.id - 1].score;
+          /* Update score */
+          event.target.parentElement.querySelector(
+            '.current-rating',
+          ).innerText = comment.score;
+        }
+      });
     } else {
       let _context = event.target.parentElement.parentElement.dataset.context;
       commentsObj.comments.forEach((mainComment) => {
@@ -226,6 +239,10 @@ class Comment {
       ref_comment.querySelector('.nickname').innerText +
       '</b> ' +
       event.target.parentElement.parentElement.querySelector('textarea').value;
+
+    document
+      .querySelector(`.comment-context[data-context='${reply_context}']`)
+      .classList.add('has-replies');
 
     let submmited_comment_object = {
       id: (idCounter += 1),
@@ -274,9 +291,15 @@ class Comment {
             `.inner-comment-box[data-comment-id="${target_id}"]`,
           );
           if (target_comment.hasAttribute('data-context')) {
-            target_comment.parentElement.remove();
+            target_comment.parentElement.classList.add('removing-comment');
+            setTimeout(() => {
+              target_comment.parentElement.remove();
+            }, 900);
           } else {
-            target_comment.parentElement.parentElement.remove();
+            target_comment.parentElement.classList.add('removing-comment');
+            setTimeout(() => {
+              target_comment.parentElement.parentElement.remove();
+            }, 900);
           }
           document.querySelector('body').classList.remove('modal-active');
           document.querySelector('.delete-modal').remove();
