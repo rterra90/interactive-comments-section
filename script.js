@@ -16,6 +16,7 @@ class Comment {
       new_comment_context.innerHTML = `<div class="default-box" data-comment="main"><div class="inner-comment-box" data-comment-id=${this.id}></div></div>`;
 
       if (document.querySelector('#comments-section-wrapper .add-comment')) {
+        // new_comment_context.childNodes[0].classList.add('anima-in')
         document
           .querySelector('#comments-section-wrapper')
           .insertBefore(
@@ -402,30 +403,49 @@ if (localStorage.commentsObj) {
 //
 //function that renders comments elements from Comment class
 function renderElements(obj) {
+  let main_comments_scores = [];
   obj.comments.forEach((comment) => {
-    comment.id > idCounter && (idCounter = comment.id);
-    let new_comment = new Comment(
-      comment.id,
-      comment.user,
-      comment.createdAt,
-      comment.content,
-      comment.score,
-      comment.replies.length,
-    );
-    new_comment.createCommentBox();
-
-    //check if the comment has replies to render
-    if (comment.replies.length > 0) {
-      let context_id = comment.id;
-      comment.replies.forEach((r) => {
-        r.id > idCounter && (idCounter = r.id);
-        idCounter += 1;
-        let reply = new Comment(r.id, r.user, r.createdAt, r.content, r.score);
-        reply.createCommentBox(context_id);
-      });
-    }
+    main_comments_scores.push(comment.score);
   });
+  main_comments_scores = main_comments_scores.sort(function (a, b) {
+    return b - a;
+  });
+
+  main_comments_scores.forEach((score) => {
+    obj.comments.forEach((comment) => {
+      if (comment.score == score) {
+        let new_comment = new Comment(
+          comment.id,
+          comment.user,
+          comment.createdAt,
+          comment.content,
+          comment.score,
+          comment.replies.length,
+        );
+        new_comment.createCommentBox();
+
+        //check if the comment has replies to render
+        if (comment.replies.length > 0) {
+          let context_id = comment.id;
+          comment.replies.forEach((r) => {
+            r.id > idCounter && (idCounter = r.id);
+            idCounter += 1;
+            let reply = new Comment(
+              r.id,
+              r.user,
+              r.createdAt,
+              r.content,
+              r.score,
+            );
+            reply.createCommentBox(context_id);
+          });
+        }
+      }
+    });
+  });
+
   let add_comment_box = Comment.addCommentBox();
 }
+
 //END function that renders comments elements from Comment class
 //
