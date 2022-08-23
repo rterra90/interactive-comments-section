@@ -369,7 +369,6 @@ class Comment {
         }),
           localStorage.setItem('commentsObj', JSON.stringify(commentsObj));
       });
-
       target_comment
         .querySelector('.main-content')
         .appendChild(edit_textarea_submit);
@@ -410,10 +409,13 @@ function renderElements(obj) {
   main_comments_scores = main_comments_scores.sort(function (a, b) {
     return b - a;
   });
-
+  let inserted_ids = [];
   main_comments_scores.forEach((score) => {
     obj.comments.forEach((comment) => {
-      if (comment.score == score) {
+      if (comment.score == score && !inserted_ids.includes(comment.id)) {
+        comment.id > idCounter && (idCounter = comment.id);
+        inserted_ids.push(comment.id);
+        //create comment
         let new_comment = new Comment(
           comment.id,
           comment.user,
@@ -422,6 +424,8 @@ function renderElements(obj) {
           comment.score,
           comment.replies.length,
         );
+        comment.inserted = true;
+
         new_comment.createCommentBox();
 
         //check if the comment has replies to render
@@ -440,10 +444,10 @@ function renderElements(obj) {
             reply.createCommentBox(context_id);
           });
         }
+        //create comment end
       }
     });
   });
-
   let add_comment_box = Comment.addCommentBox();
 }
 
