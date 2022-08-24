@@ -16,13 +16,16 @@ class Comment {
       new_comment_context.innerHTML = `<div class="default-box" data-comment="main"><div class="inner-comment-box" data-comment-id=${this.id}></div></div>`;
 
       if (document.querySelector('#comments-section-wrapper .add-comment')) {
-        // new_comment_context.childNodes[0].classList.add('anima-in')
+        new_comment_context.childNodes[0].classList.add('comment-in');
         document
           .querySelector('#comments-section-wrapper')
           .insertBefore(
             new_comment_context,
             document.querySelector('#comments-section-wrapper .add-comment'),
           );
+        setTimeout(() => {
+          new_comment_context.childNodes[0].classList.remove('comment-in');
+        }, 1500);
       } else {
         document
           .querySelector('#comments-section-wrapper')
@@ -34,9 +37,19 @@ class Comment {
       new_reply_box.classList.add('default-box');
       new_reply_box.dataset.comment = 'reply';
       new_reply_box.innerHTML = `<div class='inner-comment-box' data-context='${context_id}' data-comment-id=${this.id}></div>`;
-      document
-        .querySelector(`.comment-context[data-context='${context_id}']`)
-        .appendChild(new_reply_box);
+      if (document.querySelector('#comments-section-wrapper .add-comment')) {
+        new_reply_box.classList.add('comment-in');
+        document
+          .querySelector(`.comment-context[data-context='${context_id}']`)
+          .appendChild(new_reply_box);
+        setTimeout(() => {
+          new_reply_box.classList.remove('comment-in');
+        }, 1500);
+      } else {
+        document
+          .querySelector(`.comment-context[data-context='${context_id}']`)
+          .appendChild(new_reply_box);
+      }
     }
 
     /*Create a rating buttons element as a inner wrapper flex child*/

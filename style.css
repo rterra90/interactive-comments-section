@@ -57,11 +57,12 @@ button[data-value="yes"]:hover{
   position: relative;
 }
 .default-box{
-background-color: white;
+background-color: #fffffffe;
 border-radius: 10px;
 overflow: hidden;
 padding: 15px;
 margin: 10px 0;
+transition: background-color 2.5s;
 }
 .default-box[data-comment="reply"]{
   width: 85%;
@@ -265,25 +266,37 @@ textarea{
 }
 
 .removing-comment{
-  animation: .75s removing;
+  animation: .75s fade;
   animation-delay: .15s;
   position: relative;
 }
-.removing-comment::after{
+.removing-comment::after, .comment-in::after{
   content: '';
 position: absolute;
 top: 0;
 left: 0;
 width: 100%;
 height: 100%;
-background-color: #bd2a2f1c;
+
+}
+.removing-comment::after{
+  background-color: #bd2a2f1c;
+}
+.comment-in{
+  opacity: 0;
+  animation: .75s fade;
+  animation-direction: reverse;
+  position: relative;
+  animation-fill-mode: forwards;
+  background-color: #31b98c2f;
 }
 
-@keyframes removing {
-  from{
+@keyframes fade {
+from{
     opacity: 1;
   }
   to{
     opacity: 0;
   }
 }
+
