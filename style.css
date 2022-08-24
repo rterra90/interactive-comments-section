@@ -1,6 +1,21 @@
 :root{
   --lightwheat: #F5F6FA;
-  --defaultblue: hsl(211, 10%, 45%)
+  --defaultblue: hsl(211, 10%, 45%);
+  --bluebuttons: #5357BA
+}
+.attribution{
+  text-align: center;
+  margin-top: 80px;
+}
+#reset-btn{
+  background-color: transparent;
+  color:hsl(240, 3%, 44%);
+  padding: unset;
+  margin-top: 10px;
+  width: auto!important;
+}
+#reset-btn:hover{
+  text-decoration: underline;
 }
 body{
   background-color: var(--lightwheat);
@@ -137,6 +152,10 @@ transition: background-color 2.5s;
   font-weight: 500;
   margin: 0 0 0 auto;
   user-select: none;
+  transition: .2s;
+}
+.comment-header .reply-btn:hover{
+  opacity: .3;
 }
 .comment-header .reply-btn img{
   margin-right: 6px;
@@ -170,6 +189,15 @@ textarea{
   border-radius: 6px;
   border: var(--defaultblue) 1px solid;
   padding: 5px 10px
+}
+.you{
+  margin: 0 0 0 15px;
+  font-size: .625rem;
+  background-color: var(--bluebuttons);
+  color: white;
+  font-weight: 500;
+  padding: 2px 5px;
+  border-radius: 2px;
 }
 .reply-input textarea{
   width: 100%;
@@ -300,3 +328,41 @@ from{
   }
 }
 
+@media(max-width: 500px){
+#page-wrapper{
+  padding: 0 10px
+}
+.comment-context.has-replies::before{
+  left: 10px;
+  z-index: -10;
+}
+.inner-comment-box{
+  flex-direction: column-reverse;
+  position: relative;
+  gap: 15px;
+}
+.inner-comment-box .rating{
+  display: flex;
+  min-width: 100px;
+}
+.inner-comment-box .rating [role="button"]{
+  flex-basis: 50px;
+}
+.current-rating{
+  padding: 8px 12px;
+}
+.inner-comment-box .main-content{
+  margin-left: 0;
+}
+.comment-content{
+  padding-right: 0;
+}
+.edit, .reply-btn-wrapper{
+  position: absolute;
+  inset: auto 0 4px auto;
+}
+.delete-btn{
+  position: absolute;
+  inset: auto 40px 6px auto;
+}
+}

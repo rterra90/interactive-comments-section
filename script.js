@@ -83,6 +83,13 @@ class Comment {
 
     // create delete button
     if (this.user.username == commentsObj.currentUser.username) {
+      let youStamp = document.createElement('span');
+      youStamp.classList.add('you');
+      youStamp.innerText = 'you';
+      main_content_section
+        .querySelector('.comment-header')
+        .appendChild(youStamp);
+
       let deleteSpan = document.createElement('span');
       deleteSpan.classList.add('delete-btn');
       deleteSpan.dataset.id = this.id;
@@ -98,6 +105,7 @@ class Comment {
         .appendChild(deleteSpan);
 
       let editSpan = document.createElement('span');
+      editSpan.classList.add('edit');
       editSpan.innerHTML =
         '<span data-active=false class="reply-btn" role="button" onclick=Comment.editComment(' +
         this.id +
@@ -142,29 +150,35 @@ class Comment {
       .appendChild(add_comment);
   }
   static submitNewComment() {
-    let new_comment_obj = {
-      id: (idCounter += 1),
-      content:
-        event.target.parentElement.parentElement.querySelector('textarea')
-          .value,
-      createdAt: 'today',
-      score: 0,
-      user: commentsObj.currentUser,
-      replies: [],
-    };
-    let new_comment = new Comment(
-      new_comment_obj.id,
-      new_comment_obj.user,
-      new_comment_obj.createdAt,
-      new_comment_obj.content,
-      new_comment_obj.score,
-      new_comment_obj.replies,
-    );
-    new_comment.createCommentBox();
-
-    //Find the comment in the global comments object and update content
-    commentsObj.comments.push(new_comment_obj);
-    localStorage.setItem('commentsObj', JSON.stringify(commentsObj));
+    if (
+      event.target.parentElement.parentElement.querySelector('textarea').value
+        .length > 0
+    ) {
+      let new_comment_obj = {
+        id: (idCounter += 1),
+        content:
+          event.target.parentElement.parentElement.querySelector('textarea')
+            .value,
+        createdAt: 'today',
+        score: 0,
+        user: commentsObj.currentUser,
+        replies: [],
+      };
+      let new_comment = new Comment(
+        new_comment_obj.id,
+        new_comment_obj.user,
+        new_comment_obj.createdAt,
+        new_comment_obj.content,
+        new_comment_obj.score,
+        new_comment_obj.replies,
+      );
+      new_comment.createCommentBox();
+      event.target.parentElement.parentElement.querySelector('textarea').value =
+        '';
+      //Find the comment in the global comments object and update content
+      commentsObj.comments.push(new_comment_obj);
+      localStorage.setItem('commentsObj', JSON.stringify(commentsObj));
+    }
   }
   static createReplyComposerBox(comment_id) {
     if (event.target.dataset.active == 'false') {
