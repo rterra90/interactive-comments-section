@@ -143,7 +143,7 @@ class Comment {
     let add_comment = document.createElement('div');
     add_comment.classList.add('default-box', 'comment-composer', 'add-comment');
 
-    add_comment.innerHTML = `<div class='inner-reply'><div class='avatar'><img src=${commentsObj.currentUser.image.png}></div><div class='reply-input'><textarea name='reply-input' rows='4'></textarea></div><div class='reply-send-btn'><button onClick=Comment.submitNewComment() >Send</button></div></div>`;
+    add_comment.innerHTML = `<div class='inner-reply'><div class='avatar'><img src=${commentsObj.currentUser.image.png}></div><div class='reply-input'><textarea placeholder="Add a comment..."name='reply-input' rows='4'></textarea></div><div class='reply-send-btn'><button onClick=Comment.submitNewComment() >Send</button></div></div>`;
 
     document
       .querySelector('#comments-section-wrapper')
